@@ -22,21 +22,23 @@ import (
   goGzip "github.com/albertsundjaja/go-gzip"
 )
 
-router := httprouter.New()
+func main() {
+  router := httprouter.New()
 
-// prepare the settings
-staticHandler := goGzip.CreateNew()
-// this is the location of the parent folder of the resources
-staticHandler.ResourceFolder = "resource"
-/*
-this is the mode on what to do if a file doesnt exist
-MODE_CREATE_IF_NOT_EXIST : this will create the gzip files on the fly if it doesnt exist
-MODE_SERVE_ORIGINAL_IF_NOT_EXIST : like what the name suggest, 
-                                   it will serve the normal file if .gz files not there
-MODE_ASSUME_EXIST : this mode assumes you have created all .gz files manually,
-                    CAUTION! if the .gz files dont exist, it will return an error 404
-*/
-staticHandler.ServeMode = goGzip.MODE_CREATE_IF_NOT_EXIST
+  // prepare the settings
+  staticHandler := goGzip.CreateNew()
+  // this is the location of the parent folder of the resources
+  staticHandler.ResourceFolder = "resource"
+  /*
+  this is the mode on what to do if a file doesnt exist
+  MODE_CREATE_IF_NOT_EXIST : this will create the gzip files on the fly if it doesnt exist
+  MODE_SERVE_ORIGINAL_IF_NOT_EXIST : like what the name suggest, 
+                                     it will serve the normal file if .gz files not there
+  MODE_ASSUME_EXIST : this mode assumes you have created all .gz files manually,
+                      CAUTION! if the .gz files dont exist, it will return an error 404
+  */
+  staticHandler.ServeMode = goGzip.MODE_CREATE_IF_NOT_EXIST
 
-router.GET("/rsc/static/*filepath", staticHandler.StaticFilesHandler)
-```
+  router.GET("/rsc/static/*filepath", staticHandler.StaticFilesHandler)
+  ```
+}
