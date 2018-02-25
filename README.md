@@ -40,5 +40,5 @@ func main() {
   staticHandler.ServeMode = goGzip.MODE_CREATE_IF_NOT_EXIST
 
   router.GET("/rsc/static/*filepath", staticHandler.StaticFilesHandler)
-  ```
 }
+```
