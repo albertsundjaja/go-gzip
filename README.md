@@ -17,6 +17,11 @@ router.ServeFiles("/rsc/static/*filepath", http.Dir("resource/"))
 
 #### With go-gzip
 ```go
+
+import (
+  goGzip "github.com/albertsundjaja/go-gzip"
+)
+
 router := httprouter.New()
 
 // prepare the settings
