@@ -11,7 +11,6 @@ import (
 )
 
 func (obj goGzip) StaticFilesHandler(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
-	// get the router params *filepath
 	req.URL.Path = ps.ByName("filepath")
 
 	splitPath := strings.Split(req.URL.Path, "/")
@@ -32,17 +31,16 @@ func (obj goGzip) StaticFilesHandler(w http.ResponseWriter, req *http.Request, p
 			serveFilesWithMode(obj.ServeMode, obj.ResourceFolder, req.URL.Path, splitExtension, w, req)
 			return
 
-
 			//gzip is not supported serve normal version
 		} else {
-			fileserver := http.FileServer(http.Dir("resource"))
+			fileserver := http.FileServer(http.Dir(obj.ResourceFolder))
 			fileserver.ServeHTTP(w, req)
 			return
 		}
 
 		// not js/css requested serve normally
 	} else {
-		fileserver := http.FileServer(http.Dir("resource"))
+		fileserver := http.FileServer(http.Dir(obj.ResourceFolder))
 		fileserver.ServeHTTP(w, req)
 		return
 	}
