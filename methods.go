@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"compress/gzip"
 	"io/ioutil"
+	"log"
 )
 
 func (obj goGzip) StaticFilesHandler(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
@@ -43,6 +44,25 @@ func (obj goGzip) StaticFilesHandler(w http.ResponseWriter, req *http.Request, p
 		fileserver := http.FileServer(http.Dir(obj.ResourceFolder))
 		fileserver.ServeHTTP(w, req)
 		return
+	}
+}
+
+// preGzip everything in the resource folder
+func (obj goGzip) ProcessResourceFolder() {
+	files, err := ioutil.ReadDir(obj.ResourceFolder)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _,file := range files {
+		if !file.IsDir() {
+			filepath := obj.ResourceFolder + file.Name() + ".gz"
+			if _,err := os.Stat(filepath); os.IsNotExist(err) {
+				if err := createNewGzipFile(obj.ResourceFolder, file.Name()); err != nil {
+					log.Fatal(err)
+				}
+			}
+		}
 	}
 }
 
