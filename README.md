@@ -7,6 +7,9 @@ This go-gzip is, in essence, a Julien Schmidt's router handler which serve stati
 
 At this moment, only .js and .css files will be gzipped
 
+## Installation
+`go get -u github.com/albertsundjaja/go-gzip`
+
 ## How to use
 #### This is how to serve files normally in httprouter
 ```go
@@ -17,7 +20,6 @@ router.ServeFiles("/rsc/static/*filepath", http.Dir("resource/"))
 
 #### With go-gzip
 ```go
-
 import (
   goGzip "github.com/albertsundjaja/go-gzip"
 )
