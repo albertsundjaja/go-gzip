@@ -59,12 +59,15 @@ func (obj goGzip) ProcessResourceFolder() {
 
 	for _,file := range files {
 		if !file.IsDir() && (filepath2.Ext(file.Name()) == ".css" || filepath2.Ext(file.Name()) == ".js") {
-			filepath := filepath2.Join(obj.ResourceFolder, file.Name() + ".gz")
+			if err := createNewGzipFile(obj.ResourceFolder, file.Name()); err != nil {
+				log.Fatal(err)
+			}
+			/*
 			if _,err := os.Stat(filepath); os.IsNotExist(err) {
 				if err := createNewGzipFile(obj.ResourceFolder, file.Name()); err != nil {
 					log.Fatal(err)
 				}
-			}
+			} */
 		}
 	}
 	fmt.Println("gzip finish")
