@@ -10,6 +10,7 @@ import (
 	"io/ioutil"
 	"log"
 	filepath2 "path/filepath"
+	"fmt"
 )
 
 func (obj goGzip) StaticFilesHandler(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
@@ -50,13 +51,14 @@ func (obj goGzip) StaticFilesHandler(w http.ResponseWriter, req *http.Request, p
 
 // preGzip everything in the resource folder
 func (obj goGzip) ProcessResourceFolder() {
+	fmt.Println("gzipping resource folder")
 	files, err := ioutil.ReadDir(obj.ResourceFolder)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	for _,file := range files {
-		if !file.IsDir() {
+		if !file.IsDir() && (filepath2.Ext(file.Name()) == ".css" || filepath2.Ext(file.Name()) == ".js") {
 			filepath := filepath2.Join(obj.ResourceFolder, file.Name() + ".gz")
 			if _,err := os.Stat(filepath); os.IsNotExist(err) {
 				if err := createNewGzipFile(obj.ResourceFolder, file.Name()); err != nil {
@@ -65,6 +67,7 @@ func (obj goGzip) ProcessResourceFolder() {
 			}
 		}
 	}
+	fmt.Println("gzip finish")
 }
 
 // depening on mode selected we might need to create gzip on the fly
@@ -137,7 +140,7 @@ func createNewGzipFile(resourceFolder string, path string) error {
 	wGzip.Close()
 
 	// save buffer to file
-	err = ioutil.WriteFile(resourceFolder + path + ".gz", b.Bytes(), 0755)
+	err = ioutil.WriteFile(filepath2.Join(resourceFolder, path + ".gz"), b.Bytes(), 0755)
 	if err != nil {
 		return err
 	}
