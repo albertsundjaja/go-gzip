@@ -124,7 +124,7 @@ func serveFilesWithMode(mode int, resourceFolder string, path string, extension 
 
 func createNewGzipFile(resourceFolder string, path string) error {
 
-	fileContent, err := ioutil.ReadFile(resourceFolder + path)
+	fileContent, err := ioutil.ReadFile(filepath2.Join(resourceFolder, path))
 	if err != nil {
 		return err
 	}
