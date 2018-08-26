@@ -29,22 +29,14 @@ func main() {
 
   // create new handler
   staticHandler := goGzip.CreateNew()
-  
   // this is the location of the parent folder of the resources
   staticHandler.ResourceFolder = "resource"
-  // see explanation on ServeMode below
-  staticHandler.ServeMode = goGzip.MODE_CREATE_IF_NOT_EXIST
+  // this will create and rewrite a .gzip version of all .css and .js
+  // CAUTION: if you skip this, then the original version will be served
+  staticHandler.ProcessResourceFolder()
 
   router.GET("/rsc/static/*filepath", staticHandler.StaticFilesHandler)
 }
 ```
 
-### ServeMode
-ServeMode is the action to be taken if `.gz` file version does not yet exist
-
-**MODE\_CREATE\_IF\_NOT\_EXIST** this will create the .gz file from original file on the fly
-
-**MODE\_SERVE\_ORIGINAL\_IF\_NOT\_EXIST** it will serve the normal file if .gz file not found
-  
-**MODE\_ASSUME\_EXIST** this mode assumes you have created all .gz files manually, *CAUTION!* if the .gz file doesn't exist, it will return an error 404
 
