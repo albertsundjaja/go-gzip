@@ -9,6 +9,7 @@ import (
 	"compress/gzip"
 	"io/ioutil"
 	"log"
+	filepath2 "path/filepath"
 )
 
 func (obj goGzip) StaticFilesHandler(w http.ResponseWriter, req *http.Request, ps httprouter.Params) {
@@ -56,7 +57,7 @@ func (obj goGzip) ProcessResourceFolder() {
 
 	for _,file := range files {
 		if !file.IsDir() {
-			filepath := obj.ResourceFolder + file.Name() + ".gz"
+			filepath := filepath2.Join(obj.ResourceFolder, file.Name() + ".gz")
 			if _,err := os.Stat(filepath); os.IsNotExist(err) {
 				if err := createNewGzipFile(obj.ResourceFolder, file.Name()); err != nil {
 					log.Fatal(err)
@@ -69,6 +70,9 @@ func (obj goGzip) ProcessResourceFolder() {
 // depening on mode selected we might need to create gzip on the fly
 func serveFilesWithMode(mode int, resourceFolder string, path string, extension string, w http.ResponseWriter, req *http.Request) {
 	filePath := resourceFolder + path + ".gz"
+
+	//todo: modify to automatically use this mode
+	mode = MODE_SERVE_ORIGINAL_IF_NOT_EXIST
 
 	switch mode {
 	case MODE_SERVE_ORIGINAL_IF_NOT_EXIST:
