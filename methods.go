@@ -31,7 +31,7 @@ func (obj goGzip) StaticFilesHandler(w http.ResponseWriter, req *http.Request, p
 
 		// if gzip is supported serve the gz version
 		if flagGzip {
-			serveFilesWithMode(obj.ServeMode, obj.ResourceFolder, req.URL.Path, splitExtension, w, req)
+			serveFilesWithMode(obj.ResourceFolder, req.URL.Path, splitExtension, w, req)
 			return
 
 			//gzip is not supported serve normal version
@@ -74,48 +74,17 @@ func (obj goGzip) ProcessResourceFolder() {
 }
 
 // depening on mode selected we might need to create gzip on the fly
-func serveFilesWithMode(mode int, resourceFolder string, path string, extension string, w http.ResponseWriter, req *http.Request) {
+func serveFilesWithMode(resourceFolder string, path string, extension string, w http.ResponseWriter, req *http.Request) {
 	filePath := resourceFolder + path + ".gz"
 
-	//todo: modify to automatically use this mode
-	mode = MODE_SERVE_ORIGINAL_IF_NOT_EXIST
-
-	switch mode {
-	case MODE_SERVE_ORIGINAL_IF_NOT_EXIST:
-		if _, err := os.Stat(filePath); os.IsNotExist(err) {
-			// gz file doesnt exist break
-			break
-		} else {
-			// add the .gz at the end of the file
-			req.URL.Path = req.URL.Path + ".gz"
-			// set header to correct encoding
-			w.Header().Set("Content-Encoding", "gzip")
-			break
-		}
-
-	case MODE_CREATE_IF_NOT_EXIST:
-		if _, err := os.Stat(filePath); os.IsNotExist(err) {
-			err := createNewGzipFile(resourceFolder, path)
-			// failed to create gzip
-			if err != nil {
-				http.Error(w, "File not found / Server error", http.StatusNotFound)
-				return
-			}
-		}
+	if _, err := os.Stat(filePath); os.IsNotExist(err) {
+		// do nothing .gz doesnt exist
+	} else {
 		// add the .gz at the end of the file
 		req.URL.Path = req.URL.Path + ".gz"
 		// set header to correct encoding
 		w.Header().Set("Content-Encoding", "gzip")
-		break
-
-	case MODE_ASSUME_EXIST:
-		// add the .gz at the end of the file
-		req.URL.Path = req.URL.Path + ".gz"
-		// set header to correct encoding
-		w.Header().Set("Content-Encoding", "gzip")
-		break
 	}
-
 
 	// set content type, if not it will automatically set as app/gzip
 	if (extension == "js") {
