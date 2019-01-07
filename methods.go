@@ -31,7 +31,7 @@ func (obj goGzip) StaticFilesHandler(w http.ResponseWriter, req *http.Request, p
 
 		// if gzip is supported serve the gz version
 		if flagGzip {
-			serveFilesWithMode(obj.ResourceFolder, req.URL.Path, splitExtension, w, req)
+			serveFiles(obj.ResourceFolder, req.URL.Path, splitExtension, w, req)
 			return
 
 			//gzip is not supported serve normal version
@@ -52,29 +52,30 @@ func (obj goGzip) StaticFilesHandler(w http.ResponseWriter, req *http.Request, p
 // preGzip everything in the resource folder
 func (obj goGzip) ProcessResourceFolder() {
 	fmt.Println("gzipping resource folder")
-	files, err := ioutil.ReadDir(obj.ResourceFolder)
+
+	checkShouldZip(obj.ResourceFolder)
+
+	fmt.Println("gzip finish")
+}
+
+func checkShouldZip(parentFolder string) {
+	files, err := ioutil.ReadDir(parentFolder)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	for _,file := range files {
 		if !file.IsDir() && (filepath2.Ext(file.Name()) == ".css" || filepath2.Ext(file.Name()) == ".js") {
-			if err := createNewGzipFile(obj.ResourceFolder, file.Name()); err != nil {
+			if err := createNewGzipFile(parentFolder, file.Name()); err != nil {
 				log.Fatal(err)
 			}
-			/*
-			if _,err := os.Stat(filepath); os.IsNotExist(err) {
-				if err := createNewGzipFile(obj.ResourceFolder, file.Name()); err != nil {
-					log.Fatal(err)
-				}
-			} */
+		} else if (file.IsDir()) {
+			checkShouldZip(filepath2.Join(parentFolder, file.Name()))
 		}
 	}
-	fmt.Println("gzip finish")
 }
 
-// depening on mode selected we might need to create gzip on the fly
-func serveFilesWithMode(resourceFolder string, path string, extension string, w http.ResponseWriter, req *http.Request) {
+func serveFiles(resourceFolder string, path string, extension string, w http.ResponseWriter, req *http.Request) {
 	filePath := resourceFolder + path + ".gz"
 
 	if _, err := os.Stat(filePath); os.IsNotExist(err) {
